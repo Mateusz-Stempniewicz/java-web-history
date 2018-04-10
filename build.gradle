@@ -1,0 +1,81 @@
+buildscript {
+	ext {
+		springBootVersion = '1.5.10.RELEASE'
+		liquibaseCoreVersion = '3.5.3'
+
+		xcactusFrameworkCommonsVersion = '0.1.1-SNAPSHOT'
+	}
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+apply plugin: 'java-library'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'maven-publish'
+
+jar {
+    baseName = 'history-library'
+    version =  '0.1.0-SNAPSHOT'
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven {
+        url "http://192.168.200.201:9998/repository/snapshots/"
+    }
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: springBootVersion
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: springBootVersion
+	compile group: 'org.liquibase', name: 'liquibase-core', version: liquibaseCoreVersion
+    
+	compile group: 'com.xcactus.libs.commons', name: 'xcactus-commons-library', version: xcactusFrameworkCommonsVersion
+    
+    testCompile("junit:junit")
+}
+
+task sourceJar(type: Jar) {
+  from sourceSets.main.allJava
+  classifier "sources"
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId 'com.xcactus.libs.history'
+            artifactId 'history-library'
+            version jar.version
+            
+            from components.java
+            artifact tasks.sourceJar
+        }
+    }
+    
+    repositories {
+        maven {
+            credentials {
+              if (project.hasProperty("USERNAME")) {
+                username USERNAME
+              }
+              if (project.hasProperty("PASSWORD")) {
+                password PASSWORD
+              }
+            }
+            
+            if (jar.version.endsWith('-SNAPSHOT'))
+              url "http://192.168.200.201:9998/repository/snapshots/"
+            else
+              url "http://192.168.200.201:9998/repository/internal/"
+        }
+    }
+}

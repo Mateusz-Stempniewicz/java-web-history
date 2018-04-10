@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd
+	                    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<changeSet id="2018-03-21 15:12" author="maciej.sowa" >
+		<comment>Create history items table.</comment>
+		<createTable tableName="history_items">
+			<column name="id" type="int" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="operation_type_id" type="int">
+				<constraints nullable="false" />
+			</column>
+			<column name="object_class_id" type="int">
+				<constraints nullable="false" />
+			</column>
+            <column name="object_id" type="int">
+				<constraints nullable="false" />
+			</column>
+			<column name="property_id" type="int">
+				<constraints nullable="false" />
+			</column>
+			<column name="value" type="nvarchar(512)">
+				<constraints nullable="true" />
+			</column>
+			<column name="user_name" type="nvarchar(256)">
+				<constraints nullable="true" />
+			</column>
+			<column name="user_id" type="int">
+				<constraints nullable="true" />
+			</column>
+			<column name="date" type="datetime">
+				<constraints nullable="false" />
+			</column>
+			<column name="parent_class_type_id" type="int">
+				<constraints nullable="true" />
+			</column>
+			<column name="parent_object_id" type="int">
+				<constraints nullable="true" />
+			</column>
+		</createTable>
+	</changeSet>
+
+	<changeSet id="2018-03-22 10:16" author="maciej.sowa" >
+		<comment>Create history class names table.</comment>
+		<createTable tableName="history_classes">
+			<column name="id" type="int" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="class_name" type="nvarchar(256)">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+	</changeSet>
+
+	<changeSet id="2018-03-22 10:19" author="maciej.sowa" >
+		<comment>Create history property names table.</comment>
+		<createTable tableName="history_class_properties">
+			<column name="id" type="int" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="class_id" type="int">
+				<constraints foreignKeyName="fk_history_classes_on_properties"
+					references="history_classes(id)" />
+			</column>
+			<column name="property_name" type="nvarchar(256)">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+	</changeSet>
+
+	<changeSet id="2018-03-22 11:24" author="maciej.sowa">
+		<comment>Adding foreign key constraints.</comment>
+		<addForeignKeyConstraint constraintName="fk_history_items_on_class_id" baseColumnNames="object_class_id" baseTableName="history_items" referencedTableName="history_classes" referencedColumnNames="id"/>
+	</changeSet>
+
+
+</databaseChangeLog>
